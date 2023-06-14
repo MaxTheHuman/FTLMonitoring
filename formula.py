@@ -74,13 +74,6 @@ class Variable(Formula):
     def evaluate(self, variables):
         return variables[self.formula1]
 
-# class Static(Formula):
-#     def __init__(self, value):
-#         self.formula1 = value
-    
-#     def evaluate(self, variables):
-#         return (self.formula1, [])
-
 class Always(Formula):
     def __init__(self, formula, accumulated_result = 1):
         self.formula1 = formula
@@ -143,12 +136,9 @@ class AlmostAlways(Formula):
         return "AG{}".format(str(self.formula1))
 
     def evaluate(self, variables):
-        print("AlmostAlways evaluate start")
-        print("n_eta:", self.n_eta, "minheap:", self.minheap, "min_eta:", self.min_eta, "accumulated_result:", self.accumulated_result)
         formula_result = self.formula1.evaluate(variables)
         heapq.heappush(self.minheap, formula_result)
         heap_len = len(self.minheap)
-        print("heap_len:", heap_len)
         current_minheap = self.minheap.copy()
         current_max = 0
         if (heap_len < self.n_eta):
@@ -157,14 +147,11 @@ class AlmostAlways(Formula):
             for i in range(1, heap_len + 1):
                 current_min_value = self.min_eta[heap_len - i]
                 accumulated = t_norm(accumulated, current_min_value)
-                print("current_min_value:", current_min_value, "accumulated:", accumulated)
                 current_max = max(current_max, accumulated * self.eta.evaluate(heap_len - i))
-                print("current_max:", current_max)
         else:
             new_min_eta = SortedList()
             for i in range(self.n_eta - 1):
                 new_min_eta.add(heapq.heappop(current_minheap))
-            print("old:", self.min_eta, "new:", new_min_eta)
             if (new_min_eta != self.min_eta):
                 self.accumulated_result = t_norm(self.accumulated_result, heapq.heappop(current_minheap))
                 self.min_eta = new_min_eta
@@ -172,14 +159,11 @@ class AlmostAlways(Formula):
                 self.accumulated_result = t_norm(self.accumulated_result, formula_result)
             current_max = max(current_max, self.accumulated_result * self.eta.evaluate(self.n_eta - 1))
             accumulated_copy = self.accumulated_result
-            # print("new_min_eta:", new_min_eta)
             i = 0
             for curr_min in reversed(new_min_eta):
                 accumulated_copy = t_norm(accumulated_copy, curr_min)
                 current_max = max(current_max, accumulated_copy * self.eta.evaluate(self.n_eta - 2 - i))
                 i += 1
-        print("AlmostAlways evaluate end")
-        print("n_eta:", self.n_eta, "minheap:", self.minheap, "min_eta:", self.min_eta, "accumulated_result:", self.accumulated_result, "current_max:", current_max)
         return current_max
 
 class AlmostWeakUntil(Formula):

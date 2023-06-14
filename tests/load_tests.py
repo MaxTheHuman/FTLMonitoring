@@ -16,7 +16,7 @@ def configure_server(formulas, avoiding_function_points = {0: 1, 10: 0}, accepta
         ],
         "formulas": formulas
     })
-    # assert(resp.status_code == 200)
+    assert(resp.status_code == 200)
 
 def reset_server():
     req.get("http://127.0.0.1:5000/reset")
@@ -164,17 +164,12 @@ def measureManyEvents():
         for value in measurements:
             txt_file2.write(str(value) + ', ')
 
-    # plt.plot(np.arange(0, 3000, 1000), measurements)
-    # plt.xlabel('Количество состояний')
-    # plt.ylabel('Время вычисления правил на новом состоянии, секунды')
-    # plt.show()
-
     plt.plot(np.arange(1, 1000001, 1000), total_measurements)
     plt.xlabel('Количество состояний')
     plt.ylabel('Время вычисления правил на 1000 состояний, секунды')
     plt.show()
 
 if __name__ == '__main__':
-    # measureDiffentRulesNumber()
-    # measureDiffentNEta()
+    measureDiffentRulesNumber()
+    measureDiffentNEta()
     measureManyEvents()
